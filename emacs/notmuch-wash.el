@@ -219,6 +219,18 @@ that PREFIX should not include a newline."
 				   :type button-type)))
 	  (overlay-put overlay 'notmuch-wash-button button))))))
 
+(defun notmuch-wash-signature-find-end (start end)
+  "Return point for end of signature no further away than END."
+  (save-excursion
+    (goto-char start)
+    (while (and (< (point) end)
+                (not (looking-at "^-----END PGP "))
+                (not (eobp)))
+      (forward-line 1))
+    (if (> (point) end)
+        (goto-char end))
+    (point)))
+
 (defun notmuch-wash-excerpt-citations (msg depth)
   "Excerpt citations and up to one signature."
   (goto-char (point-min))
@@ -250,13 +262,15 @@ that PREFIX should not include a newline."
   (if (and (not (eobp))
 	   (re-search-forward notmuch-wash-signature-regexp nil t))
       (let* ((sig-start (match-beginning 0))
-	     (sig-end (match-end 0))
-	     (sig-lines (count-lines sig-start (point-max))))
+	     (sig-end (notmuch-wash-signature-find-end
+                       (match-end 0)
+                       (point-max)))
+	     (sig-lines (count-lines sig-start sig-end)))
 	(if (<= sig-lines notmuch-wash-signature-lines-max)
 	    (let ((sig-start-marker (make-marker))
 		  (sig-end-marker (make-marker)))
 	      (set-marker sig-start-marker sig-start)
-	      (set-marker sig-end-marker (point-max))
+	      (set-marker sig-end-marker sig-end)
 	      (overlay-put (make-overlay sig-start-marker sig-end-marker) 'face 'message-cited-text)
 	      (notmuch-wash-region-to-button
 	       msg sig-start-marker sig-end-marker
