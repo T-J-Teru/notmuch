@@ -551,6 +551,8 @@ the CLI and emacs interface."))
 				search-query (plist-get options :filter)))
 	       (message-count (prog1 (read (current-buffer))
 				(forward-line 1))))
+          (when (plist-member options :search-type)
+            (plist-put elem-plist :search-type (plist-get options :search-type)))
 	  (when (and filtered-query (or (plist-get options :show-empty-searches) (> message-count 0)))
 	    (setq elem-plist (plist-put elem-plist :query filtered-query))
 	    (plist-put elem-plist :count message-count))))
@@ -933,7 +935,8 @@ following:
    nil
    :initially-hidden (not notmuch-show-all-tags-list)
    :hide-tags notmuch-hello-hide-tags
-   :filter notmuch-hello-tag-list-make-query))
+   :filter notmuch-hello-tag-list-make-query
+   :search-type 'tree))
 
 (defun notmuch-hello-insert-footer ()
   "Insert the notmuch-hello footer."
