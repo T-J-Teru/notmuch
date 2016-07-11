@@ -322,12 +322,11 @@ function produces a section simply by adding content to the current
 buffer.  A section should not end with an empty line, because a
 newline will be inserted after each section by `notmuch-hello'.
 
-Each function should take no arguments. The return value is
-ignored.
+Each element of the list can also be a list of the form (FUNC
+ARG1 ARG2 .. ARGN) in which case FUNC will be applied to the rest
+of the list.
 
-For convenience an element can also be a list of the form (FUNC ARG1
-ARG2 .. ARGN) in which case FUNC will be applied to the rest of the
-list.
+The return value of each function is ignored.
 
 A \"Customized tag-list section\" item in the customize-interface
 displays a list of all tags, optionally hiding some of them. It
@@ -929,14 +928,14 @@ following:
 				  (notmuch-hello-generate-tag-alist))
 				 :filter "tag:inbox"))
 
-(defun notmuch-hello-insert-alltags ()
+(defun notmuch-hello-insert-alltags (&rest options)
   "Insert a section displaying all tags and associated message counts"
-  (notmuch-hello-insert-tags-section
-   nil
-   :initially-hidden (not notmuch-show-all-tags-list)
-   :hide-tags notmuch-hello-hide-tags
-   :filter notmuch-hello-tag-list-make-query
-   :search-type 'tree))
+  (let ((args (list
+               nil
+               :initially-hidden (not notmuch-show-all-tags-list)
+               :hide-tags notmuch-hello-hide-tags
+               :filter notmuch-hello-tag-list-make-query)))
+    (apply 'notmuch-hello-insert-tags-section (append args options))))
 
 (defun notmuch-hello-insert-footer ()
   "Insert the notmuch-hello footer."
