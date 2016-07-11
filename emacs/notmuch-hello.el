@@ -311,7 +311,7 @@ International Bureau of Weights and Measures."
 	#'notmuch-hello-insert-saved-searches
 	#'notmuch-hello-insert-search
 	#'notmuch-hello-insert-recent-searches
-	#'notmuch-hello-insert-alltags
+	'(notmuch-hello-insert-alltags :search-type tree)
 	#'notmuch-hello-insert-footer)
   "Sections for notmuch-hello.
 
